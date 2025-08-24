@@ -1,0 +1,31 @@
+.container {
+    text-align: center;
+    margin-top: 50px;
+    font-family: sans-serif;
+}
+
+.letter-box {
+    display: inline-block;
+    padding: 30px 50px;
+    font-size: 48px;
+    border: 3px solid #333;
+    border-radius: 10px;
+    background-color: #f0f0f0;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.letter-box.blue {
+    background-color: blue;
+    color: white;
+}
+
+.letter-box.green {
+    background-color: green;
+    color: white;
+}
+
+.letter-box.red {
+    background-color: red;
+    color: white;
+}
