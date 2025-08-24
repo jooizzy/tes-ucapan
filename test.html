@@ -3,16 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Latihan Baca</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Test Huruf</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            margin: 20px;
+            color: #333;
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .huruf {
+            font-size: 40px;
+            margin: 15px;
+            padding: 20px 30px;
+            background: #fff;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s, color 0.3s;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+        }
+        .huruf.biru { background: #007bff; color: white; }
+        .huruf.hijau { background: #28a745; color: white; }
+        .huruf.merah { background: #dc3545; color: white; }
+        .mic {
+            margin-top: 30px;
+            font-size: 18px;
+            padding: 10px 20px;
+            border: none;
+            background: #007bff;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .mic:disabled {
+            background: #aaa;
+            cursor: not-allowed;
+        }
+        p#status {
+            margin-top: 15px;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
 </head>
 <body>
+    <h1>Sentuh Huruf & Ucapkan</h1>
     <div class="container">
-        <h1>Latihan Interaktif</h1>
-        <p>Sentuh kotak dan ucapkan huruf di dalamnya.</p>
-        <div class="letter-box" id="letter">ba</div>
-        <button id="ulang">Ulangi</button>
+        <div class="huruf" data-huruf="ba">Ba</div>
+        <div class="huruf" data-huruf="bi">Bi</div>
+        <div class="huruf" data-huruf="bu">Bu</div>
+        <div class="huruf" data-huruf="be">Be</div>
+        <div class="huruf" data-huruf="bo">Bo</div>
     </div>
-    <script src="script.js"></script>
+    <button class="mic" id="micBtn" disabled>🎤 Ucapkan</button>
+    <p id="status">Klik huruf terlebih dahulu</p>
+
+    <script>
+        let selectedHuruf = null;
+
+        // Pilih huruf
+        document.querySelectorAll('.huruf').forEach(el => {
+            el.addEventListener('click', () => {
+                document.querySelectorAll('.huruf').forEach(h => h.classList.remove('biru','hijau','merah'));
+                el.classList.add('biru');
+                selectedHuruf = el.getAttribute('data-huruf');
+                document.getElementById('status').textContent = `Huruf dipilih: ${selectedHuruf}`;
+                document.getElementById('micBtn').disabled = false;
+            });
+        });
+
+        // Speech Recognition
+        const micBtn = document.getElementById('micBtn');
+        const statusText = document.getElementById('status');
+        let recognition;
+
+        if ('webkitSpeechRecognition' in window) {
+            recognition = new webkitSpeechRecognition();
+            recognition.lang = 'id-ID';
+            recognition.continuous = false;
+            recognition.interimResults = false;
+
+            recognition.onstart = () => {
+                statusText.textContent = 'Mendengarkan...';
+            };
+
+            recognition.onresult = (event) => {
+                const hasil = event.results[0][0].transcript.toLowerCase().trim();
+                if (hasil === selectedHuruf.toLowerCase()) {
+                    statusText.textContent = `Benar! Kamu mengucapkan: ${hasil}`;
+                    document.querySelector('.huruf.biru').classList.remove('biru');
+                    document.querySelector(`[data-huruf="${selectedHuruf}"]`).classList.add('hijau');
+                } else {
+                    statusText.textContent = `Salah! Kamu mengucapkan: ${hasil}`;
+                    document.querySelector('.huruf.biru').classList.remove('biru');
+                    document.querySelector(`[data-huruf="${selectedHuruf}"]`).classList.add('merah');
+                }
+            };
+
+            recognition.onerror = (e) => {
+                statusText.textContent = 'Terjadi kesalahan, coba lagi.';
+            };
+
+            recognition.onend = () => {
+                micBtn.disabled = false;
+                micBtn.textContent = '🎤 Ucapkan';
+            };
+
+            micBtn.addEventListener('click', () => {
+                micBtn.disabled = true;
+                micBtn.textContent = '🎤 Mendengarkan...';
+                recognition.start();
+            });
+        } else {
+            statusText.textContent = 'Browser kamu tidak mendukung Speech Recognition.';
+        }
+    </script>
 </body>
 </html>
