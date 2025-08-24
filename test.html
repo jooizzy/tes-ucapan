@@ -32,23 +32,17 @@
             cursor: pointer;
             transition: background 0.3s, color 0.3s;
             box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+            position: relative;
         }
         .huruf.biru { background: #007bff; color: white; }
         .huruf.hijau { background: #28a745; color: white; }
         .huruf.merah { background: #dc3545; color: white; }
-        .mic {
-            margin-top: 30px;
+        .icon {
+            position: absolute;
+            right: 8px;
+            top: 8px;
             font-size: 18px;
-            padding: 10px 20px;
-            border: none;
-            background: #007bff;
-            color: white;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-        .mic:disabled {
-            background: #aaa;
-            cursor: not-allowed;
+            font-weight: bold;
         }
         p#status {
             margin-top: 15px;
@@ -60,33 +54,17 @@
 <body>
     <h1>Sentuh Huruf & Ucapkan</h1>
     <div class="container">
-        <div class="huruf" data-huruf="ba">Ba</div>
-        <div class="huruf" data-huruf="bi">Bi</div>
-        <div class="huruf" data-huruf="bu">Bu</div>
-        <div class="huruf" data-huruf="be">Be</div>
-        <div class="huruf" data-huruf="bo">Bo</div>
+        <div class="huruf" data-huruf="baca">Baca</div>
+        <div class="huruf" data-huruf="aba">Aba</div>
+        <div class="huruf" data-huruf="caba">Caba</div>
+        <div class="huruf" data-huruf="baba">Baba</div>
+        <div class="huruf" data-huruf="caca">Caca</div>
     </div>
-    <button class="mic" id="micBtn" disabled>🎤 Ucapkan</button>
-    <p id="status">Klik huruf terlebih dahulu</p>
+    <p id="status">Klik huruf untuk memulai</p>
 
     <script>
-        let selectedHuruf = null;
-
-        // Pilih huruf
-        document.querySelectorAll('.huruf').forEach(el => {
-            el.addEventListener('click', () => {
-                document.querySelectorAll('.huruf').forEach(h => h.classList.remove('biru','hijau','merah'));
-                el.classList.add('biru');
-                selectedHuruf = el.getAttribute('data-huruf');
-                document.getElementById('status').textContent = `Huruf dipilih: ${selectedHuruf}`;
-                document.getElementById('micBtn').disabled = false;
-            });
-        });
-
-        // Speech Recognition
-        const micBtn = document.getElementById('micBtn');
-        const statusText = document.getElementById('status');
         let recognition;
+        const statusText = document.getElementById('status');
 
         if ('webkitSpeechRecognition' in window) {
             recognition = new webkitSpeechRecognition();
@@ -100,34 +78,52 @@
 
             recognition.onresult = (event) => {
                 const hasil = event.results[0][0].transcript.toLowerCase().trim();
-                if (hasil === selectedHuruf.toLowerCase()) {
-                    statusText.textContent = `Benar! Kamu mengucapkan: ${hasil}`;
-                    document.querySelector('.huruf.biru').classList.remove('biru');
-                    document.querySelector(`[data-huruf="${selectedHuruf}"]`).classList.add('hijau');
+                const hurufAktif = document.querySelector('.huruf.biru');
+                if (!hurufAktif) return;
+
+                const target = hurufAktif.getAttribute('data-huruf').toLowerCase();
+
+                hurufAktif.classList.remove('biru');
+
+                if (hasil.includes(target)) {
+                    statusText.textContent = `✔ Benar! Kamu mengucapkan: ${hasil}`;
+                    hurufAktif.classList.add('hijau');
+                    hurufAktif.innerHTML = `${hurufAktif.textContent} <span class="icon">✔</span>`;
                 } else {
-                    statusText.textContent = `Salah! Kamu mengucapkan: ${hasil}`;
-                    document.querySelector('.huruf.biru').classList.remove('biru');
-                    document.querySelector(`[data-huruf="${selectedHuruf}"]`).classList.add('merah');
+                    statusText.textContent = `✖ Salah! Kamu mengucapkan: ${hasil}`;
+                    hurufAktif.classList.add('merah');
+                    hurufAktif.innerHTML = `${hurufAktif.textContent} <span class="icon">✖</span>`;
                 }
             };
 
-            recognition.onerror = (e) => {
+            recognition.onerror = () => {
                 statusText.textContent = 'Terjadi kesalahan, coba lagi.';
             };
 
             recognition.onend = () => {
-                micBtn.disabled = false;
-                micBtn.textContent = '🎤 Ucapkan';
+                // otomatis selesai
             };
-
-            micBtn.addEventListener('click', () => {
-                micBtn.disabled = true;
-                micBtn.textContent = '🎤 Mendengarkan...';
-                recognition.start();
-            });
         } else {
             statusText.textContent = 'Browser kamu tidak mendukung Speech Recognition.';
         }
+
+        // Event klik huruf → langsung mulai mic
+        document.querySelectorAll('.huruf').forEach(el => {
+            el.addEventListener('click', () => {
+                // Reset semua
+                document.querySelectorAll('.huruf').forEach(h => {
+                    h.classList.remove('biru','hijau','merah');
+                    h.innerHTML = h.getAttribute('data-huruf').charAt(0).toUpperCase() + h.getAttribute('data-huruf').slice(1);
+                });
+
+                el.classList.add('biru');
+
+                if (recognition) {
+                    recognition.stop(); // pastikan tidak ada sesi lama
+                    recognition.start(); // mulai dengar
+                }
+            });
+        });
     </script>
 </body>
 </html>
