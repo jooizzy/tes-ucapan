@@ -1,58 +1,293 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cek Ucapan dengan Teks</title>
-<style>
-body { font-family: Arial; text-align: center; padding: 20px; }
-#teksTarget { font-size: 22px; font-weight: bold; margin-bottom: 15px; }
-button { padding: 10px 20px; font-size: 18px; border-radius: 8px; }
-#hasilUcapan { margin-top: 20px; font-size: 18px; }
-</style>
-</head>
-<body>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Kuis Huruf - Halaman 1</title>
 
-<h2>Cek Ucapan dengan Teks</h2>
-<p id="teksTarget">Halo dunia</p>
-<button onclick="mulaiRekam()">🎤 Mulai Bicara</button>
-<p id="hasilUcapan">Ucapan Anda: </p>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
 
-<script>
-function mulaiRekam() {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-        alert("Browser tidak mendukung Speech Recognition");
-        return;
+  <style>
+    :root{
+      --black: #000;
+      --grey: #8a8a8a;
+      --red:  #d32f2f;
+      --touch-size: 24pt; /* sesuai permintaan */
     }
 
-    const recognition = new SpeechRecognition();
-    recognition.lang = 'id-ID';
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
+    html,body{
+      height:100%;
+      margin:0;
+      font-family: 'Be Vietnam Pro', sans-serif;
+      background:#fff;
+      color:var(--black);
+      -webkit-tap-highlight-color: transparent;
+      text-align: center;
+    }
 
-    recognition.start();
+    .wrap{
+      max-width:760px;
+      margin:18px auto;
+      padding:16px;
+      
+    }
 
-    recognition.onstart = () => {
-        console.log("🎤 Mendengarkan...");
-    };
+    h1{
+      font-size:1.25rem;
+      margin:0 0 12px 0;
+      
+    }
 
-    recognition.onresult = (event) => {
-        const ucapan = event.results[0][0].transcript;
-        document.getElementById("hasilUcapan").innerText = "Ucapan Anda: " + ucapan;
-    };
+    .buttons{
+      display:flex;
+      justify-content: center;
+      gap:12px;
+      margin-bottom:20px;
+      flex-wrap:wrap;
+      text-align: center;
+    }
 
-    recognition.onerror = (event) => {
-        if (event.error === "not-allowed") {
-            alert("❌ Akses mikrofon ditolak. Izinkan mikrofon di browser.");
-        } else if (event.error === "service-not-allowed") {
-            alert("❌ Web Speech API tidak diizinkan oleh browser.");
-        } else {
-            alert("Terjadi kesalahan: " + event.error);
-        }
-    };
+    .letter-btn{
+      background:#f4f4f4;
+      border:1px solid #ddd;
+      border-radius:8px;
+      padding:18px 26px;
+      font-size:var(--touch-size);
+      cursor:pointer;
+      user-select:none;
+      touch-action:manipulation;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:72px;
+      
+    }
+
+    .letter-btn:active{ transform:scale(1.1); }
+
+    .letter {
+      font-weight:800;
+      font-size: 38pt;
+      
+    }
+
+    .letter.black { color: var(--black); }
+    .letter.grey  { color: var(--grey); }
+    .letter.red   { color: var(--red); }
+
+    .line {
+      margin:12px 0;
+      font-size: var(--touch-size);
+      line-height:1.5;
+      word-break:break-word;
+      text-align: center;
+    }
+
+    .segment{
+      margin-right:12px;
+      display:inline-block;
+      padding:6px 8px;
+      border-radius:6px;
+      
+      
+    }
+
+    .hint{
+      margin-top:18px;
+      font-size:0.95rem;
+      color:#555;
+    }
+
+    .controls{
+      margin-top:18px;
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content: center;
+    }
+
+    .btn{
+      padding:10px 14px;
+      border-radius:6px;
+      border:1px solid #ccc;
+      background:#fff;
+      cursor:pointer;
+    }
+    .nav-btn {
+  background-color: #00aa71ff; 
+  color: white; 
+  padding: 10px 20px; 
+  border: none; 
+  border-radius: 5px; 
+  font-size: 16px;
+  font-weight: 900;
+  cursor: pointer;
 }
-</script>
+    
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Halaman 1 — Mengenal Huruf</h1>
 
+    <!-- Tombol utama: huruf a dan ba (warna hitam awalnya) -->
+    <div class="buttons">
+      <div class="letter-btn" data-type="a" role="button" aria-label="huruf a">
+        <span class="letter black">a</span>
+        
+      </div>
+
+      <div class="letter-btn" data-type="ba" role="button" aria-label="huruf ba">
+        <span class="letter black">ba</span>
+      </div>
+    </div>
+
+    <!-- Paragraf baru berisi urutan yang diminta -->
+    <div class="line" id="line1">
+      <!-- "aa a (warna hitam) a (warna abu tua)" -->
+      <span class="letter black">a</span>&nbsp;&nbsp;&nbsp;<span class="letter grey">a</span>&nbsp;&nbsp;&nbsp;<span class="letter black">ba</span>&nbsp;&nbsp;&nbsp;<span class="letter grey">ba</span>
+
+    </div>
+
+    <div class="line" id="line2">
+      <!-- "aba (a warna hitam) ba (warna abu tua)" -->
+      <span class="segment"><span class="letter black">a</span><span> &nbsp;&nbsp;&nbsp;</span><span class="letter grey">ba</span></span>&nbsp;
+      <span class="letter black">a</span><span class="letter grey">ba</span>
+    </div>
+
+    <div class="line" id="line3">
+      <!-- "baba (ba warna hitam) dan (ba warna abu)" -->
+      <span class="letter black">ba</span><span class="letter grey">ba</span>&nbsp;&nbsp;&nbsp;
+      <span class="letter black">a</span><span class="letter grey">ba</span>-<span class="letter black">a</span><span class="letter grey">ba</span>
+    </div>
+
+    <div class="line" id="line4">
+      <!-- "baa (ba warna hitam) dan (a warna abu)" -->
+      <span class="letter black">a</span>&nbsp;&nbsp;&nbsp;<span class="letter grey">ba</span>
+    </div>
+
+    <div class="controls">
+  <button class="btn" id="resetBtn">Reset warna</button>
+  <button class="btn" id="toggleSound">Mute / Unmute</button>  
+  <button class="nav-btn" onclick="window.location.href='test.html'">Next</button>
+</div>
+
+    <p class="hint">Sentuh huruf <strong>a</strong> atau <strong>ba</strong> di atas untuk memutar suara.</p>
+  </div>
+
+  <!-- Audio (ganti nama file jika format berbeda, mis: suaraA.m3 → suaraA.mp3) -->
+  <audio id="audio-a" preload="auto" src="Hijaiyah/Fathah/suaraA.mp3"></audio>
+  <audio id="audio-ba" preload="auto" src="Hijaiyah/Fathah/suaraBa.mp3"></audio>
+
+  <script>
+    // Element references
+    const btnA = document.querySelector('.letter-btn[data-type="a"]');
+    const btnBa = document.querySelector('.letter-btn[data-type="ba"]');
+    const audioA = document.getElementById('audio-a');
+    const audioBa = document.getElementById('audio-ba');
+    const resetBtn = document.getElementById('resetBtn');
+    const toggleSoundBtn = document.getElementById('toggleSound');
+    let soundEnabled = true;
+
+    // helper: set active (red) for a letter span passed (the visible .letter)
+    function setActiveLetter(el) {
+      // remove red class from all same-letter types if you want single-active behavior
+      // but here we only change the clicked element's visual
+      el.classList.remove('black','grey');
+      el.classList.add('red');
+    }
+
+    function playSoundFor(type){
+      if(!soundEnabled) return;
+      if(type === 'a'){
+        if(audioA){
+          audioA.currentTime = 0;
+          audioA.play().catch(()=>{ /* ignore autoplay issues */ });
+        }
+      } else if(type === 'ba'){
+        if(audioBa){
+          audioBa.currentTime = 0;
+          audioBa.play().catch(()=>{});
+        }
+      }
+    }
+
+    // On touch/click handlers for top buttons
+    btnA.addEventListener('click', ()=> {
+      const span = btnA.querySelector('.letter');
+      setActiveLetter(span);
+      playSoundFor('a');
+    });
+
+    btnBa.addEventListener('click', ()=> {
+      const span = btnBa.querySelector('.letter');
+      setActiveLetter(span);
+      playSoundFor('ba');
+    });
+
+    // Also allow clicking any letter in the body lines:
+    document.querySelectorAll('.line .letter').forEach(letterEl => {
+      letterEl.style.cursor = 'pointer';
+      letterEl.addEventListener('click', (e)=>{
+        const text = letterEl.textContent.trim().toLowerCase();
+        // determine whether this span is 'a' or 'ba' (or composite like 'aa','ba' etc)
+        if(text === 'a'){
+          setActiveLetter(letterEl);
+          playSoundFor('a');
+        } else if(text === 'ba'){
+          setActiveLetter(letterEl);
+          playSoundFor('ba');
+        } else {
+          // for composites like "aa" or "baba" we can try to find inner 'a' or 'ba' spans;
+          // in our markup composites are made of adjacent spans; if text length>2, do nothing
+        }
+      });
+    });
+
+    resetBtn.addEventListener('click', ()=>{
+      document.querySelectorAll('.letter').forEach(el=>{
+        el.classList.remove('red');
+        // restore original black/grey depending on existing class in markup:
+        // if element originally had grey in markup we keep it grey; else black.
+        // We'll check data-state by scanning text color in DOM: simpler -> use attribute
+        // But since markup uses classes black/grey, restore those if present in HTML source:
+        // We'll default to black if neither present.
+        if(el.classList.contains('grey')) {
+          // already grey -> keep grey
+          el.classList.remove('black','red');
+          el.classList.add('grey');
+        } else {
+          el.classList.remove('grey','red');
+          el.classList.add('black');
+        }
+      });
+    });
+
+    toggleSoundBtn.addEventListener('click', ()=>{
+      soundEnabled = !soundEnabled;
+      toggleSoundBtn.textContent = soundEnabled ? 'Mute / Unmute' : 'Mute / Unmute';
+      // visual feedback optional
+      toggleSoundBtn.style.opacity = soundEnabled ? '1' : '0.6';
+    });
+
+    // mobile-friendly: ensure touchstart triggers same as click
+    function bindTouch(el, fn){
+      el.addEventListener('touchstart', function(e){
+        e.preventDefault();
+        fn();
+      }, {passive:false});
+    }
+    bindTouch(btnA, ()=> btnA.click());
+    bindTouch(btnBa, ()=> btnBa.click());
+
+    // Ensure initial classes intact (some browsers may rearrange)
+    (function initRestore(){
+      document.querySelectorAll('.letter').forEach(el=>{
+        if(!el.classList.contains('black') && !el.classList.contains('grey') && !el.classList.contains('red')){
+          el.classList.add('black');
+        }
+      });
+    })();
+  </script>
 </body>
 </html>
